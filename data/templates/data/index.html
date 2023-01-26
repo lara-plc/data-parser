@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'data/css/style.css' %}">
+    <title>Parser</title>
+</head>
+
+<body>
+    <form class="form--container" method="post">
+        <input type="file" class="file--send" id="file--input">
+    </form>
+
+    <ul class="data--balance"></ul>
+
+    <script>
+
+        const FILE = document.getElementById("file--input");
+        const STATIC_URL = "http://127.0.0.1:8000/api/data/";
+
+        const homeBank = async () => {
+            const response = await fetch(STATIC_URL);
+            const data = await response.json()
+            const datas = [];
+            let contador = 0;
+
+            const ul = document.querySelector(".data--balance");
+            ul.innerHTML = ``
+
+
+            for (let i = 0; i < data.length; i++) {
+                for (let c = 0; c < data.length; c++) {
+                    if (data[i].company_name === datas[c]?.company_name) {
+                        contador++;
+                    }
+                }
+
+                if (contador === 0) {
+                    data[i]["balance"] = 0;
+                    datas.push(data[i])
+                }
+                contador = 0
+            }
+
+
+            for (let i = 0; i < datas.length; i++) {
+                for (let c = 0; c < data.length; c++) {
+                    if (datas[i].company_name === data[c].company_name) {
+                        if (data[c].type === 2 || data[c].type === 3 || data[c].type === 9) {
+                            datas[i].balance -= data[c].value
+                        } else {
+                            datas[i].balance += data[c].value
+                        }
+                    }
+                }
+            }
+
+            datas.forEach(data => {
+                let li = document.createElement("li");
+
+                li.innerHTML = `
+                <p>Data: ${data.company_name}</p>
+                <p>Balance: ${data.balance.toFixed(2)}</p>
+                `
+
+                ul.appendChild(li);
+            })
+        }
+
+        const submitArchive = file => {
+            const request = new XMLHttpRequest();
+            const formData = new FormData();
+
+            request.open("POST", STATIC_URL, true);
+            request.setRequestHeader('Content-type', 'text/plain');
+
+            formData.append("file", file);
+            request.send(formData.get("file"));
+
+            setTimeout(() => {
+                document.location.reload(true)
+            }, 3000)
+
+        }
+
+        FILE.addEventListener("change", event => {
+            const file = event.target.files
+            submitArchive(file[0])
+        })
+
+        homeBank();
+
+    </script>
+</body>
+
+</html>

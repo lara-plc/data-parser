@@ -6,14 +6,14 @@ Stacks: Python, Django, HTML5, CSS3, JavaScript
 
 ## Passos para configuração:
 
-### Dependências:
+#### Dependências:
 `pip install -r requirements.txt`
 
-### Gerar banco de dados local:
+#### Gerar banco de dados local:
 `python manage.py migrate`
 
 
-### Rodar o server
+#### Rodar o server
 `python manage.py runserver`
 
 
